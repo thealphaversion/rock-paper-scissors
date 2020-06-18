@@ -2,6 +2,8 @@ class GameMechanincs {
     constructor(player_1, player_2) {
         this._players = [player_1, player_2];
         this._turns = [null, null];
+        this.score=[0,0]
+        this.count=0 //Keeps track of no of games
 
         this._sendToPlayers("Game Starts!");
 
@@ -40,8 +42,26 @@ class GameMechanincs {
             this._sendToPlayers("Round over: Round => " + turns.join(" : "));
             this._getResult();
             this._turns = [null, null];
-            this._sendToPlayers("Next round start");
+            this._sendToPlayers(`Score: ${this.score[0]} - ${this.score[1]}`)
+            if (this.count==5){
+                if (this.score[0]>this.score[1]){
+                    this._winMessage(this._players[0], this._players[1]);
+                }
+                else if(this.score[0]<this.score[1]){
+                    this._winMessage(this._players[1], this._players[0]);
+                }
+                else{
+                    this._sendToPlayers("Draw")
+                }
+            }
+            else{
+                this._sendToPlayers("Next round start");
+            }
+            
+           
+            
         }
+        
     }
 
     _getResult() {
@@ -58,13 +78,16 @@ class GameMechanincs {
         // if (p2 - p1) is 1, p1 wins
         // if (p2 - p1) is 2, p2 wins
         const distance = (value_player_2 - value_player_1 + 3) % 3;
+        if(distance === 0){
+            this.count=this.count+1
+        }
+        else if (distance === 1) {
+            this.score[0]=this.score[0]+1
+            this.count=this.count+1
 
-        if (distance === 0) {
-            this._sendToPlayers("Draw");
-        } else if (distance === 1) {
-            this._winMessage(this._players[0], this._players[1]);
         } else if (distance === 2) {
-            this._winMessage(this._players[1], this._players[0]);
+            this.score[1]=this.score[1]+1
+            this.count=this.count+1
         } else {
             throw new Error("Error in result");
         }
