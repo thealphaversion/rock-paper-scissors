@@ -2,6 +2,7 @@ class GameMechanincs {
     constructor(player_1, player_2) {
         this._players = [player_1, player_2];
         this._turns = [null, null];
+        this._endgame = [null, null];
         this.score=[0,0]
         this.count=0 //Keeps track of no of games
 
@@ -11,6 +12,12 @@ class GameMechanincs {
         this._players.forEach((player, player_index) => {
             player.on("turn", (turn) => {
                 this._onTurn(player_index, turn);
+            });
+        });
+
+        this._players.forEach((player, player_index) => {
+            player.on("endgameoptions", (turn) => {
+                this._onEnd(player_index, turn);
             });
         });
     }
@@ -34,6 +41,26 @@ class GameMechanincs {
         this._roundOver();
     }
 
+    // to capture option after game ends
+    _onEnd(player_index, turn) {
+        this._endgame[player_index] = turn; // setting player turn
+        // TODO: add more logic to restrict player changing their choice here
+        if(this._endgame[player_index]==='same')
+        {
+            this._sendFeedbackToPlayer(player_index, `Waiting for opponent.`);
+            this._sendFeedbackToPlayer(1-player_index, `Opponent wants a rematch.`);
+
+        }
+        if(this._endgame[0]==='same' && this._endgame[1]==='same'){
+            this.count=0
+            this.score=[0,0]
+            this._restart()
+        }
+        
+
+        this._roundOver();
+    }
+
     // this will check if the current game or round is over.
     _roundOver() {
         const turns = this._turns;
@@ -46,6 +73,7 @@ class GameMechanincs {
             if (this.count==5){
                 if (this.score[0]>this.score[1]){
                     this._winMessage(this._players[0], this._players[1]);
+                    
                 }
                 else if(this.score[0]<this.score[1]){
                     this._winMessage(this._players[1], this._players[0]);
@@ -53,6 +81,7 @@ class GameMechanincs {
                 else{
                     this._sendToPlayers("Draw")
                 }
+                this._gameOver()
             }
             else{
                 this._sendToPlayers("Next round start");
@@ -96,6 +125,12 @@ class GameMechanincs {
     _winMessage(winner, loser) {
         winner.emit("message", "You Won!");
         loser.emit("message", "You Lost.");
+    }
+    _gameOver() {
+        this._players.forEach((element) => element.emit("over"));
+    }
+    _restart() {
+        this._players.forEach((element) => element.emit("restart"));
     }
 
     _decodeTurn(turn) {

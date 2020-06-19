@@ -7,12 +7,17 @@
         <div class="info">
             <ul id="events"></ul>
         </div>
-        <div class="buttons">
+        <div class="buttons" id="buttons">
             <button id="rock">Rock</button>
             <button id="paper">Paper</button>
             <button id="scissors">Scissors</button>
         </div>
         <div id="name"></div>
+        <div id="option" style="display:none;">
+            <button id="same">Play against the same opponent</button>
+            <button id="new">New Game</button>
+            <button id="end">Back to Home</button>
+        </div>
     </body>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/static/game.js"></script>
